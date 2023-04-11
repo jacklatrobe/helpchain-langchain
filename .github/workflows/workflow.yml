@@ -23,7 +23,7 @@ jobs:
         token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
         
     - name: Build container image
-      run: docker build -t registry.digitalocean.com/helpchain/langchain-service:$(echo $GITHUB_SHA | head -c7) .
+      run: docker build -t registry.digitalocean.com/helpchain/langchain-service:$(echo $GITHUB_SHA | head -c7) --build-arg openaikey=${{ secrets.OPENAI_KEY }} .
       
     - name: Log in to DigitalOcean Container Registry with short-lived credentials
       run: doctl registry login --expiry-seconds 1200
