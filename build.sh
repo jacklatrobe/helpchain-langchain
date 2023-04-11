@@ -1,5 +1,6 @@
 ## Based ofF:
 ## https://docs.digitalocean.com/tutorials/build-deploy-first-image/
+## NOTE: This has now been automated with GitHub actions
 
 # Build the image
 docker build -t langchain-service .
