@@ -9,8 +9,8 @@ app = Flask(__name__)
 
 @app.route("/")
 def hello():
-    html = """Hello {name}!
-    Hostname: {hostname}"""
+    html = """Welcome to the container hosting: {name}!
+    Current instance hostname: {hostname}"""
     return html.format(name=os.getenv("NAME", "world"), hostname=socket.gethostname())
 
 if __name__ == "__main__":
