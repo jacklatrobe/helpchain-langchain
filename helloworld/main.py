@@ -1,0 +1,17 @@
+## Kube demo app
+## https://docs.digitalocean.com/tutorials/build-deploy-first-image/
+
+from flask import Flask
+import os
+import socket
+
+app = Flask(__name__)
+
+@app.route("/")
+def hello():
+    html = """Hello {name}!
+    Hostname: {hostname}"""
+    return html.format(name=os.getenv("NAME", "world"), hostname=socket.gethostname())
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=80)
