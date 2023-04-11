@@ -4,7 +4,6 @@
 from flask import Flask
 import os
 import socket
-import langchain
 import openai
 
 app = Flask(__name__)

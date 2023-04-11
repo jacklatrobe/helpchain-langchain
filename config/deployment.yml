@@ -1,14 +1,14 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: langchain-app
+  name: langchain-service
   labels:
-    app: langchain-app
+    app: langchain-service
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: langchain-app
+      app: langchain-service
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -17,10 +17,10 @@ spec:
   template:
     metadata:
       labels:
-        app: langchain-app
+        app: langchain-service
     spec:
       containers:
-      - name: langchain-app
+      - name: langchain-service
         image: registry.digitalocean.com/helpchain/langchain-service
         ports:
         - containerPort: 80
@@ -46,4 +46,4 @@ spec:
       port: 443
       targetPort: 443
   selector:
-    app: langchain-app
+    app: langchain-service
