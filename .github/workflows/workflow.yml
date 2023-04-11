@@ -42,6 +42,3 @@ jobs:
     - name: Verify deployment of langchain-service
       run: kubectl rollout status deployment/langchain-service
       
-    - name: Expose service via Load Balancer
-      run: kubectl expose deployment langchain-service --type=LoadBalancer --port=80 --target-port=80
-      
