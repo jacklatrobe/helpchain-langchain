@@ -7,16 +7,19 @@ import socket
 import openai
 
 app = Flask(__name__)
+openai.api_key = os.getenv("OPENAI_KEY")
 
 @app.route("/")
 def hello():
-    # Get OpenAI secret
+    print(openai.api_key)
 
-    openai.api_key = os.getenv("OPENAI_KEY")
+    try:
+        response = openai.Completion.create(model="text-davinci-003", prompt="Write a simple page using HTML and CSS that announces this site is under construction, which includes a random quote of the day in the centre of the page", temperature=0.3, max_tokens=1024)
+        response = response["choices"][0]["text"]
+    except Exception as ex:
+        response = "Error in GPT API: {}".format(ex)
 
-    html = openai.Completion.create(model="gpt-3.5-turbo", prompt="Return HTML code that displays a simple under construction page with a cute, randomly generated message from GPT in the middle", temperature=0.1, max_tokens=1024)
-
-    return html
+    return response
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=80)
+    app.run(host='0.0.0.0', port=8080)
