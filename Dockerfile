@@ -2,10 +2,10 @@
 FROM python:slim
 
 # Set the working directory to /app
-WORKDIR /helloworld
+WORKDIR /langchain-service
 
 # Copy the current directory contents into the container at /app
-ADD /helloworld/. /helloworld
+ADD /langchain-service/. /langchain-service
 
 # Install any needed packages specified in requirements.txt
 RUN pip install -r requirements.txt
@@ -14,7 +14,7 @@ RUN pip install -r requirements.txt
 EXPOSE 80
 
 # Define environment variable
-ENV NAME World
+ENV NAME LangChain
 
 # Run app.py when the container launches
 CMD ["python", "main.py"]
