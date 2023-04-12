@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
       - name: langchain-service
-        image: registry.digitalocean.com/helpchain/langchain-service:latest
+        image: registry.digitalocean.com/helpchain/langchain-service
         imagePullPolicy: Always
         ports:
         - containerPort: 80
