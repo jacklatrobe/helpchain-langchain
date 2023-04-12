@@ -14,7 +14,7 @@ def hello():
     print(openai.api_key)
 
     try:
-        response = openai.Completion.create(model="text-davinci-003", prompt="Write a simple page using HTML and CSS that announces this site is under construction, which includes a random quote of the day in the centre of the page", temperature=0.3, max_tokens=1024)
+        response = openai.Completion.create(model="text-davinci-003", prompt="Write a HTML and CSS page that announces this site is under construction, which includes a random quote of the day in the centre of the page", temperature=0.3, max_tokens=1024)
         response = response["choices"][0]["text"]
     except Exception as ex:
         response = "Error in GPT API: {}".format(ex)
