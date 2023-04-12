@@ -7,11 +7,11 @@ import socket
 import openai
 
 app = Flask(__name__)
-openai.api_key = os.environ.get("OPENAI_KEY")
 
 @app.route("/")
 def hello():
     try:
+        openai.api_key = os.environ.get("OPENAI_KEY")
         response = openai.Completion.create(model="text-davinci-003", prompt="Write a HTML and CSS page that announces this site is under construction, which includes a random quote of the day in the centre of the page", temperature=0.3, max_tokens=1024)
         response = response["choices"][0]["text"]
     except Exception as ex:
