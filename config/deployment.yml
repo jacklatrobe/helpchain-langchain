@@ -11,7 +11,7 @@ spec:
       app: langchain-service
   strategy:
     rollingUpdate:
-      maxSurge: 1
+      maxSurge: 5
       maxUnavailable: 1
   minReadySeconds: 5
   template:
@@ -21,15 +21,16 @@ spec:
     spec:
       containers:
       - name: langchain-service
-        image: registry.digitalocean.com/helpchain/langchain-service
+        image: registry.digitalocean.com/helpchain/langchain-service:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 80
-        resources:
-          requests:
-            cpu: 100m
-          limits:
-            cpu: 100m
+        livenessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5
       imagePullSecrets: 
       - name: registry-helpchain
 ---
