@@ -5,7 +5,7 @@ metadata:
   labels:
     app: langchain-service
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: langchain-service
@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
       - name: langchain-service
-        image: registry.digitalocean.com/helpchain/langchain-service
+        image: <IMAGE>
         imagePullPolicy: Always
         ports:
         - containerPort: 80
