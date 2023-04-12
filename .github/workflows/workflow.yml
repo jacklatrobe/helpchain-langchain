@@ -40,7 +40,7 @@ jobs:
 
     - name: Add secrets for the registry
       run: >
-      kubectl patch serviceaccount default -p '{"imagePullSecrets": [{"name": "registry-helpchain"}]}''
+        kubectl patch serviceaccount default -p '{"imagePullSecrets": [{"name": "registry-helpchain"}]}''
       
     - name: Deploy to DigitalOcean Kubernetes
       run: kubectl apply -f $GITHUB_WORKSPACE/config/deployment.yml
