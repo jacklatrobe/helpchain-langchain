@@ -49,14 +49,14 @@ jobs:
     - name: Push image to DigitalOcean Container Registry
       run: docker push registry.digitalocean.com/helpchain/langchain-service:$(echo $GITHUB_SHA | head -c7)
 
+    - name: Save DigitalOcean kubeconfig with short-lived credentials for cluster helpchain
+      run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 helpchain
+
     - name: Push registry configuration to cluster
       run: doctl registry kubernetes-manifest | kubectl apply -f -
       
     - name: Update deployment file
       run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|registry.digitalocean.com/helpchain/langchain-service:'${TAG}'|' $GITHUB_WORKSPACE/config/deployment.yml
-      
-    - name: Save DigitalOcean kubeconfig with short-lived credentials for cluster helpchain
-      run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 helpchain
 
     - name: Deploy to DigitalOcean Kubernetes
       run: kubectl apply -f $GITHUB_WORKSPACE/config/deployment.yml
