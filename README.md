@@ -4,10 +4,18 @@ helpchain-langchain - The langchain component of the HelpChain chatbot platform 
 HelpChain LangChain is a containerised backend microservice for LangChain that is hosted on Kubernetes. It is designed to provide advanced language processing capabilities, including data-awareness and agentic interaction, to your applications.
 
 ## Getting Started
+See the file in .github/workflows/ for an example of how to automate the deployment.
+~~~
+docker build .
+docker push
+kubectl apply -f config/deployment.yml
+~~~
 
 ### Prerequisites
-- Docker
-- Kubernetes
+- Docker, for building images
+- Kubernetes, for hosting deployed images
+- Kubectl, for managing clusters and deployments
+- GitHub Actions, if you want to automate the above
 
 ### Installation
 
