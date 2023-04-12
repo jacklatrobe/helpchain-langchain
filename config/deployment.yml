@@ -29,8 +29,8 @@ spec:
             cpu: 100m
           limits:
             cpu: 100m
-      imagePullPolicy: Always
-      imagePullSecrets: registry-helpchain
+        imagePullPolicy: Always
+        imagePullSecrets: registry-helpchain
 ---
 apiVersion: v1
 kind: Service
