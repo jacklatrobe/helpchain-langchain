@@ -7,7 +7,7 @@ import socket
 import openai
 
 app = Flask(__name__)
-openai.api_key = os.getenv("OPENAI_KEY")
+openai.api_key = os.environ("OPENAI_KEY")
 
 @app.route("/")
 def hello():

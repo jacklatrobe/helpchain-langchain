@@ -1,5 +1,5 @@
 # We need an OpenAI API key for the solution to work
-ARG openaikey
+ARG OPENAIKEY
 
 # Use an official Python runtime as a parent image
 FROM python:slim
@@ -18,7 +18,7 @@ EXPOSE 80
 
 # Define environment variable
 ENV NAME LangChain
-ENV OPENAI_KEY $openaikey
+ENV OPENAI_KEY=$OPENAIKEY
 
 # Run app.py when the container launches
 CMD ["python", "main.py"]
