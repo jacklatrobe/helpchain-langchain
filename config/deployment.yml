@@ -22,6 +22,7 @@ spec:
       containers:
       - name: langchain-service
         image: registry.digitalocean.com/helpchain/langchain-service
+        imagePullPolicy: Always
         ports:
         - containerPort: 80
         resources:
@@ -29,9 +30,8 @@ spec:
             cpu: 100m
           limits:
             cpu: 100m
-        imagePullPolicy: Always
-        imagePullSecrets: 
-        - name: registry-helpchain
+      imagePullSecrets: 
+      - name: registry-helpchain
 ---
 apiVersion: v1
 kind: Service
