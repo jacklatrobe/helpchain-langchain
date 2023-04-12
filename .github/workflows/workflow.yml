@@ -37,6 +37,9 @@ jobs:
       
     - name: Save DigitalOcean kubeconfig with short-lived credentials for cluster helpchain
       run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 helpchain
+
+    - name: Confirm that the correct secrets for registry are added
+      run: kubectl patch serviceaccount default -p '{"imagePullSecrets": [{"name": "registry-helpchain"}]}'
       
     - name: Deploy to DigitalOcean Kubernetes
       run: kubectl apply -f $GITHUB_WORKSPACE/config/deployment.yml
