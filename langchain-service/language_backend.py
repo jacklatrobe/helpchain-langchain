@@ -13,12 +13,14 @@ from langchain.agents import load_tools, Tool
 from langchain.agents import initialize_agent
 from langchain.agents import AgentType
 
-load_dotenv()
+load_dotenv(".env")
 
 def intelligent_response(query):
-    openai.api_key=os.getenv("OPENAI_KEY")
-
-
+    if os.environ.get("OPENAI_KEY") is None:
+        return "OpenAI API key error"
+    if os.environ.get("OPENWEATHERMAP_API_KEY") is None:
+        return "OpenWeatherMap API key error"
+    openai.api_key=os.environ.get("OPENAI_KEY")
     wikipedia = WikipediaAPIWrapper()
     weather = OpenWeatherMapAPIWrapper()
     control_llm = OpenAI(temperature=0.1)
@@ -51,7 +53,6 @@ def intelligent_response(query):
     ]   
 
     agent = initialize_agent(tools, control_llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True)
-
     return agent.run(query)
 
 def smart_location_extractor(query):
