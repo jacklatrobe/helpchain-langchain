@@ -13,14 +13,11 @@ app = Flask(__name__)
 
 @app.route("/")
 def hello():
-    try:
-        openai.api_key = os.environ.get("OPENAI_KEY")
-        response = openai.Completion.create(model="text-davinci-003", prompt="Write a quote of the day, wrapped in HTML <div> tags", temperature=0.7, max_tokens=200)
-        response = response["choices"][0]["text"]
-    except Exception as ex:
-        response = "Error in GPT API: {}".format(ex)
+    openai.api_key = os.environ.get("OPENAI_KEY")
+    response = openai.Completion.create(model="text-davinci-003", prompt="Write a quote of the day, wrapped in HTML <div> tags", temperature=0.7, max_tokens=200)
+    response = response["choices"][0]["text"]
 
-    return render_template('index.html', response)
+    return render_template('index.html', response=response)
 
 @app.route("/health")
 def healthcheck():
