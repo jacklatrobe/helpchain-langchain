@@ -12,8 +12,8 @@ WORKDIR /langchain-service
 ADD /langchain-service/. /langchain-service
 
 # Overwrite the python .env file for the /langchain-service
-RUN echo "OPENAI_KEY=${OPENAIKEY}" > /langchain-service/.env
-RUN echo "OPENWEATHERMAP_API_KEY=${WEATHERKEY}" > /langchain-service/.env
+RUN echo "OPENAI_KEY=${OPENAIKEY}" > /langchain-service/helpchain.env
+RUN echo "OPENWEATHERMAP_API_KEY=${WEATHERKEY}" >> /langchain-service/helpchain.env
 
 # Install any needed packages specified in requirements.txt
 RUN pip install -r requirements.txt
