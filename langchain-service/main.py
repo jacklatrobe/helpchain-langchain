@@ -2,10 +2,13 @@
 ## File: langchain-service/main.py
 
 from flask import Flask, render_template
+from dotenv import load_dotenv
 import os
 import socket
 import openai
 
+
+load_dotenv()
 app = Flask(__name__)
 
 @app.route("/")
