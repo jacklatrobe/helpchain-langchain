@@ -11,9 +11,6 @@ app = Flask(__name__)
 
 @app.route("/")
 def hello():
-    if(os.path.isfile(".env")):
-        return "Dotenv file does not exist"
-    load_dotenv()
     openai.api_key=os.getenv("OPENAI_KEY")
     if(openai.api_key == None):
         return "Error setting API key"
