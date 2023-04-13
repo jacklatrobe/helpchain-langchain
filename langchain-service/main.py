@@ -9,7 +9,7 @@ app = Flask(__name__)
 @app.route("/")
 def hello():
     query = request.args.get('query')
-    if not query:
+    if request.args.get('query') is None:
         return render_template("index.html")
     response = intelligent_response(query)
     return render_template("index.html", response=response)

@@ -24,8 +24,8 @@ spec:
         image: <IMAGE>
         imagePullPolicy: Always
         env:
-        - name: OPENAI_KEY
-          value: <OPENAI_KEY>
+        - name: OPENAI_API_KEY
+          value: <OPENAI_API_KEY>
         - name: OPENWEATHERMAP_API_KEY
           value: <OPENWEATHERMAP_API_KEY>
         ports:
