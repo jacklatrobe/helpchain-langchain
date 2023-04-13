@@ -41,7 +41,7 @@ jobs:
       working-directory: ./config/
         
     - name: Build container image
-      run: docker build -t registry.digitalocean.com/helpchain/langchain-service:$(echo $GITHUB_SHA | head -c7) --build-arg WEATHERKEY=${{ secrets.OPENWEATHERMAP_API_KEY }} --build-arg OPENAIKEY=${{ secrets.OPENAI_API_KEY }} .
+      run: docker build -t registry.digitalocean.com/helpchain/langchain-service:$(echo $GITHUB_SHA | head -c7) --build-arg WEATHERKEY=${{ secrets.OPENWEATHERMAP_API_KEY }} --build-arg OPENAIKEY=${{ secrets.OPENAI_KEY }} .
       
     - name: Log in to DigitalOcean Container Registry with short-lived credentials
       run: doctl registry login --expiry-seconds 1200
@@ -59,7 +59,7 @@ jobs:
       run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|registry.digitalocean.com/helpchain/langchain-service:'${TAG}'|' $GITHUB_WORKSPACE/config/deployment.yml
 
     - name: Update deployment file
-      run: sed -i 's|<OPENAI_KEY>|${{ secrets.OPENAI_API_KEY }}|' $GITHUB_WORKSPACE/config/deployment.yml
+      run: sed -i 's|<OPENAI_KEY>|${{ secrets.OPENAI_KEY }}|' $GITHUB_WORKSPACE/config/deployment.yml
 
     - name: Update deployment file
       run: sed -i 's|<OPENWEATHERMAP_API_KEY>|${{ secrets.OPENWEATHERMAP_API_KEY }}|' $GITHUB_WORKSPACE/config/deployment.yml
