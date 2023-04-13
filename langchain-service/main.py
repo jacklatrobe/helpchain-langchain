@@ -15,7 +15,7 @@ def hello():
     if(openai.api_key == None):
         return "Error setting API key"
     
-    response = openai.Completion.create(model="text-davinci-003", prompt="Generate an inspirational quote that is funny because it is attributed to the wrong person.", temperature=0.4, max_tokens=256)
+    response = openai.Completion.create(model="text-davinci-003", prompt="HelpChain is an application that uses semantic chains to exponentially multiply the capabilities of large language models such as GPT4. Write an introduction for their website landling page and explain that the application is under construction", temperature=0.4, max_tokens=256)
     response = response["choices"][0]["text"]
 
     return render_template('index.html', response=response)
