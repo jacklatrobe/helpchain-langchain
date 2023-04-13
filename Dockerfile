@@ -1,5 +1,6 @@
 # We need an OpenAI API key for the solution to work
 ARG OPENAIKEY
+ARG WEATHERKEY
 
 # Use an official Python runtime as a parent image
 FROM python:slim
@@ -12,6 +13,7 @@ ADD /langchain-service/. /langchain-service
 
 # Overwrite the python .env file for the /langchain-service
 RUN echo "OPENAI_KEY=${OPENAIKEY}" > /langchain-service/.env
+RUN echo "OPENWEATHERMAP_API_KEY=${WEATHERKEY}" > /langchain-service/.env
 
 # Install any needed packages specified in requirements.txt
 RUN pip install -r requirements.txt
