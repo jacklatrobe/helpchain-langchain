@@ -15,13 +15,14 @@ RUN echo "OPENAI_KEY=${OPENAIKEY}" > /langchain-service/.env
 
 # Install any needed packages specified in requirements.txt
 RUN pip install -r requirements.txt
+RUN pip install -U python-dotenv
 
 # Make port 80 available to the world outside this container
 EXPOSE 80
 
 # Define environment variable
 ENV NAME=LangChain
-ENV OPENAI_KEY=${OPENAIKEY}
+ENV OPENAI_KEY="${OPENAIKEY}"
 
 # Run app.py when the container launches
 CMD ["python", "main.py"]
