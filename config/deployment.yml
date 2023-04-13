@@ -23,6 +23,9 @@ spec:
       - name: langchain-service
         image: <IMAGE>
         imagePullPolicy: Always
+        env:
+        - name: OPENAI_KEY
+          value: <OPENAI_KEY>
         ports:
         - containerPort: 80
         livenessProbe:

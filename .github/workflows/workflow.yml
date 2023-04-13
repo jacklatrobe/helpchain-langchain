@@ -58,6 +58,9 @@ jobs:
     - name: Update deployment file
       run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|registry.digitalocean.com/helpchain/langchain-service:'${TAG}'|' $GITHUB_WORKSPACE/config/deployment.yml
 
+    - name: Update deployment file
+      run: sed -i 's|<OPENAI_KEY>|{{ $secrets.OPENAI_KEY }}|' $GITHUB_WORKSPACE/config/deployment.yml
+
     - name: Deploy to DigitalOcean Kubernetes
       run: kubectl apply -f $GITHUB_WORKSPACE/config/deployment.yml
       

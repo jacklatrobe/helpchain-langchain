@@ -22,7 +22,6 @@ EXPOSE 80
 
 # Define environment variable
 ENV NAME=LangChain
-ENV OPENAI_KEY="${OPENAIKEY}"
 
 # Run app.py when the container launches
 CMD ["python", "main.py"]
