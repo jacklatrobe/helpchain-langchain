@@ -26,6 +26,8 @@ spec:
         env:
         - name: OPENAI_KEY
           value: <OPENAI_KEY>
+        - name: OPENWEATHERMAP_API_KEY
+          value: <OPENWEATHERMAP_API_KEY>
         ports:
         - containerPort: 80
         livenessProbe:

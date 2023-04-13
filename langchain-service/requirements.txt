@@ -2,3 +2,5 @@ python-dotenv
 Flask
 langchain
 openai
+wikipedia
+pyowm
