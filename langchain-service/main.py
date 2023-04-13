@@ -11,11 +11,14 @@ app = Flask(__name__)
 
 @app.route("/")
 def hello():
+    if(os.path.exists(".env")):
+        return "Error setting API key"
     load_dotenv()
     openai.api_key=os.getenv("OPENAI_KEY")
     if(openai.api_key == None):
         return "Error setting API key"
-    response = openai.Completion.create(model="text-davinci-003", prompt="Generate an inspirational quote that is funny because it is attributed to the wrong person. Examples include: 'If at first you don't succeed, try and try again - Lee Harvey Oswald' and 'If at first you don't succeed, give up, fail fast and move on - Yoda'", temperature=0.4, max_tokens=256)
+    
+    response = openai.Completion.create(model="text-davinci-003", prompt="Generate an inspirational quote that is funny because it is attributed to the wrong person.", temperature=0.4, max_tokens=256)
     response = response["choices"][0]["text"]
 
     return render_template('index.html', response=response)
