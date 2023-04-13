@@ -59,7 +59,7 @@ jobs:
       run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|registry.digitalocean.com/helpchain/langchain-service:'${TAG}'|' $GITHUB_WORKSPACE/config/deployment.yml
 
     - name: Update deployment file
-      run: sed -i 's|<OPENAI_KEY>|${{ secrets.OPENAI_KEY }}|' $GITHUB_WORKSPACE/config/deployment.yml
+      run: sed -i 's|<OPENAI_API_KEY>|${{ secrets.OPENAI_KEY }}|' $GITHUB_WORKSPACE/config/deployment.yml
 
     - name: Update deployment file
       run: sed -i 's|<OPENWEATHERMAP_API_KEY>|${{ secrets.OPENWEATHERMAP_API_KEY }}|' $GITHUB_WORKSPACE/config/deployment.yml
