@@ -6,4 +6,6 @@ wikipedia
 pyowm
 validators
 requests
+json
+beautifulsoup4
 tiktoken
