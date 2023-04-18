@@ -12,6 +12,7 @@ def hello():
     if request.args.get('query') is None:
         return render_template("index.html")
     response = intelligent_response(query)
+    response = response.replace("\n","<br />\n")
     return render_template("index.html", response=response, query=query)
 
 @app.route("/health")

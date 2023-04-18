@@ -21,11 +21,11 @@
     <hr>
     <div id="response_block">
         <div id="query_block">
-            <h2>{{ query }}</h2>
+            <h2>{{ query|safe }}</h2>
         </div>
         <div id="response_body">
             <p>
-                {{ response }}
+                {{ response|safe }}
             </p>
         </div>
     </div>

@@ -12,6 +12,7 @@ from langchain.llms import OpenAI
 from langchain.chains import LLMChain
 from langchain.utilities import WikipediaAPIWrapper
 from langchain.utilities import OpenWeatherMapAPIWrapper
+from langchain.text_splitter import CharacterTextSplitter
 from langchain.agents import load_tools, Tool
 from langchain.agents import initialize_agent
 from langchain.agents import AgentType
@@ -22,6 +23,7 @@ if os.path.isfile("helpchain.env"):
 else:
     raise FileNotFoundError("helpchain.env file not located")
 
+
 # intelligent_response - entry point and wrapper function
 def intelligent_response(query):
     if os.environ.get("OPENAI_API_KEY") is None:
@@ -29,28 +31,28 @@ def intelligent_response(query):
     if os.environ.get("OPENWEATHERMAP_API_KEY") is None:
         return "OpenWeatherMap API key error"
 
-    prompt = "Create a well-writen, well-referenced and factually accurate response to the query. Make your response at least three well-written paragraphs. Include relevant URLs where you know them. Their query was:\n{}".format(query)
+    prompt = "Write an accurate, detailed and well-researched response to the following query, question or request:\n{}".format(query)
     token_llm = OpenAI()
     prompt_tokens = int(400 + (1.25 * token_llm.get_num_tokens(prompt)))
     if(prompt_tokens > 1000):
         return "Error generating response - prompt was too long"
-    control_llm = OpenAI(temperature=0.2, max_tokens=(3000-prompt_tokens))
+    control_llm = OpenAI(temperature=0.3, max_tokens=(3000-prompt_tokens))
     tools = [
         Tool(
             name="Intermediate Answer",
             func=researcher,
-            description="Useful for when you need to look up additional information, documents, URLs or other research to provide an answer. This tool accepts the entire query as text and returns relevant research. This tool can look up URLs"
+            description="A general purpose researcher. This tool takes inputs such as URLs, concepts to research or questions to answer and returns a research summary to use in other answers"
         )
     ]   
 
-    agent = initialize_agent(tools, control_llm, agent=AgentType.SELF_ASK_WITH_SEARCH, verbose=True)
-
+    agent = initialize_agent(tools, control_llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True)
     result = agent.run(prompt)
 
     if is_good_response(query,result):
         return result
     else:
-        prompt = compressor("Our system was given this prompt:\n{query}\n\nOur system produced the following output:\n{result}\n\nWhen we assessed the output against the original query, it did not answer the question correctly. Could you try to answer the query in a different way?".format(query=query,result=result))
+        prompt = "Our system was given this prompt:\n{query}\n\nOur system produced the following output:\n{result}\n\nWhen we assessed the output against the original query, it did not answer the question correctly. Could you try to answer the query in a different way?".format(query=query,result=result)
+        agent = initialize_agent(tools, control_llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True)
         result = agent.run(prompt)
     if is_good_response(query,result):
         return result
@@ -66,17 +68,17 @@ def researcher(query):
     prompt_tokens = int(400 + (1.25 * token_llm.get_num_tokens(prompt)))
     if(prompt_tokens > 1000):
         return "Error generating response - prompt was too long, please rephrase your query as a research question"
-    control_llm = OpenAI(temperature=0.3, max_tokens=(3000-prompt_tokens))
+    control_llm = OpenAI(temperature=0.2, max_tokens=500)
     tools = [
         Tool(
             name="Solve complex problems with frameworks",
             func=framework,
-            description="This tool uses knowledge of problem solving frameworks such as agile, systems thinking and communications theory to suggest structured steps that could be followed to solve more complex challenges. Submit the whole initial query and any relevant context to this tool."
+            description="This tool uses knowledge of problem solving frameworks such as agile, systems thinking and communications theory to suggest structured steps that could be followed to solve more complex challenges. Submit a summary of the query and context to this tool"
         ),
         Tool(
             name="Search Wikipedia for articles",
             func=wikipedia.run,
-            description="Useful for searching for general information about people, places, concepts and historical events. The input for this tool should be in the format of the specific encyclopedia article you are looking for"
+            description="Useful for searching for encyclopedia articles about people, places, concepts and historical events. This tool takes key words or search terms as an input"
         ),
         Tool(
             name="Lookup current weather data",
@@ -94,14 +96,24 @@ def researcher(query):
             description="Answers questions like 'Who are you?' and 'What is this?' and 'Who built this?'. This current platform (HelpChain) was built by the Latrobe Consulting Group. This tool provides information about the Latrobe Consulting Group (LCG). Always provide the URL in the format https://latrobe.group/"
         ),
         Tool(
-            name="Opens a single webpage, article or document and gets the LLM to convert and summarise it",
+            name="Load a Webpage",
             func=read_webpage,
-            description="A portal to the internet. Useful for loading a webpage, article or document given a valid as an input URL. Useful for reading customer docs, developer docs, product documentation when we know the URL. The input for this tool must be a URL similar to: 'http://example.com/'. "
+            description="Use this tool first for all URLs. A portal to the internet. Useful for loading a webpage, article or document given a valid as an input URL. Useful for reading customer docs, developer docs, product documentation when we know the URL. The input for this tool must be a URL similar to: 'http://example.com/'"
+        ),
+        Tool(
+            name="Brainstorm",
+            func=brainstorm,
+            description="Use this tool to brainstorm new approaches, theories or ways of solving problems or creating new things."
+        ),
+        Tool(
+            name="Draft",
+            func=drafter,
+            description="Use this tool to create drafts of writing or snippets of text"
         )
     ]
     agent = initialize_agent(tools, control_llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True)
     response = agent.run(prompt)
-    return compressor(response)
+    return response
 
 # smart_location_extractor - Extract a location from a query (For OpenWeatherMap)
 def smart_location_extractor(query):
@@ -115,7 +127,7 @@ def latrobe_consulting(query):
 
 # is_good_response - Check if your response is high quality, or try to improve it more
 def is_good_response(initial, planned):
-    agent_prompt="Generated text:\n{initial}\n\nOriginal question or task:\n{planned}\n\nAnswering only Yes or No, does the generated text answer the question, and is it accurate?".format(initial=initial, planned=planned)
+    agent_prompt="Generated text:\n{planned}\n\nOriginal question or task:\n{initial}\n\nAnswering only Yes or No, does the generated text answer the question, and is it accurate?".format(initial=initial, planned=planned)
     control_llm = OpenAI(temperature=0)
     result = control_llm(agent_prompt)
     if result == "No":
@@ -131,7 +143,7 @@ def framework(query):
         template="The following step is a task that a user is trying to do while trying to solve a challenge or answer a question. Use your knowledge of problem solving frameworks such as agile, systems thinking and communications theory to suggest structured steps that the user could follow to solve the problem, being as descriptive as possible.\n\nTheir challenge is: {query}"
     )
     chain = LLMChain(llm=llm, prompt=prompt)
-    return compressor(chain.predict(query=query))
+    return chain.predict(query=query)
 
 # read_the_docs - Opens a single webpage, article or document and gets the LLM to convert and summarise it
 def read_webpage(query):
@@ -140,22 +152,45 @@ def read_webpage(query):
     f = requests.get(query)
     html = BeautifulSoup(f.content, "html.parser")
     body = " ".join(html.body.text.split())
-    llm = OpenAI(temperature=0.2)
-    prompt = PromptTemplate(
-        input_variables=["content"],
-        template="The following is text from the body of a webpage. Convert it into well formatted text, taking specific care to preserve any URLs, code examples or step by step technical instructions. \n\nThe content of the page is:\n{query}"
-    )
-    chain = LLMChain(llm=llm, prompt=prompt)
-    return compressor(chain.predict(content=content))
+    texts = split_str(body, 5000)
+    llm = OpenAI(temperature=0, max_tokens=2000)
+    responses = []
+    for text in texts:
+        responses.append(llm("Clean up and summarise this text copied from a web page: {}".format(text)))
+    response = "\n".join(responses)
+    print(response)
+    token_llm = OpenAI()
+    prompt_tokens = int(400 + (1.25 * token_llm.get_num_tokens(response)))
+    if(prompt_tokens < 500):
+        return response
+    elif(prompt_tokens < 2000):
+        return llm("Join and summarise these blocks of text: {}".format(response))
+    else:
+        return "Page was too long to load and summarise - try a different URL"
 
-def compressor(text):
-    prompt = "compress the following text in a way that is lossless but results in the minimum number of tokens which could be fed into an LLM like yourself as-is and produce the same output. feel free to use multiple languages, symbols, other up-front priming to lay down rules. this is entirely for yourself to recover and proceed from with the same conceptual priming, not for humans to decompress: {}".format(text)
-    prompt_tokens=int(len(prompt) * 4)
+def brainstorm(text):
+    prompt = "Brainstorm new ideas, theories or approaches given the following context:\n{}".format(text)
+    token_llm = OpenAI()
+    prompt_tokens = int(400 + (1.25 * token_llm.get_num_tokens(prompt)))
     if(prompt_tokens > 2000):
         return "Error generating response - prompt was too long"
-    compressor_llm = OpenAI(temperature=0, max_tokens=(4000-prompt_tokens))
-    return compressor_llm(prompt)
+    brainstorm_llm = OpenAI(temperature=0, max_tokens=(3000-prompt_tokens))
+    return brainstorm_llm(prompt)
 
-def summariser(text):
-    compressor_llm = OpenAI(temperature=0)
-    return compressor_llm("Summarise: {}".format(text))
+def drafter(text):
+    prompt = "Draft a high quality piece of writing in response to the following: {}".format(text)
+    token_llm = OpenAI()
+    prompt_tokens = int(400 + (1.25 * token_llm.get_num_tokens(prompt)))
+    if(prompt_tokens > 2000):
+        return "Error summarising response - input prompt was too long"
+    drafter_llm = OpenAI(temperature=0, max_tokens=(3000-prompt_tokens))
+    return drafter_llm(prompt)
+
+def split_str(seq, chunk, skip_tail=False):
+    lst = []
+    if chunk <= len(seq):
+        lst.extend([seq[:chunk]])
+        lst.extend(split_str(seq[chunk:], chunk, skip_tail))
+    elif not skip_tail and seq:
+        lst.extend([seq])
+    return lst
