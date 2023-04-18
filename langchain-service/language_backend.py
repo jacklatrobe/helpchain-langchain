@@ -6,6 +6,7 @@ import os
 import validators
 import requests
 from dotenv import load_dotenv
+from bs4 import BeautifulSoup
 from langchain.prompts import PromptTemplate
 from langchain.llms import OpenAI
 from langchain.chains import LLMChain
@@ -29,10 +30,11 @@ def intelligent_response(query):
         return "OpenWeatherMap API key error"
 
     prompt = "Create a well-writen, well-referenced and factually accurate response to the query. Make your response at least three well-written paragraphs. Include relevant URLs where you know them. Their query was:\n{}".format(query)
-    prompt_tokens = int(len(prompt) * 4)
-    if(prompt_tokens > 2000):
+    token_llm = OpenAI()
+    prompt_tokens = int(400 + (1.25 * token_llm.get_num_tokens(prompt)))
+    if(prompt_tokens > 1000):
         return "Error generating response - prompt was too long"
-    control_llm = OpenAI(temperature=0.3, max_tokens=(4000-prompt_tokens))
+    control_llm = OpenAI(temperature=0.2, max_tokens=(3000-prompt_tokens))
     tools = [
         Tool(
             name="Intermediate Answer",
@@ -45,21 +47,26 @@ def intelligent_response(query):
 
     result = agent.run(prompt)
 
-    if is_good_response(query,compressor(result)):
+    if is_good_response(query,result):
         return result
     else:
-        prompt = compressor("Our system was given this prompt:\n{query}\n\nOur system produced the following output:\n{result}\n\nThe response was not accurate. Try again".format(query=query,result=result))
-        return agent.run(prompt)
+        prompt = compressor("Our system was given this prompt:\n{query}\n\nOur system produced the following output:\n{result}\n\nWhen we assessed the output against the original query, it did not answer the question correctly. Could you try to answer the query in a different way?".format(query=query,result=result))
+        result = agent.run(prompt)
+    if is_good_response(query,result):
+        return result
+    else:
+        return "HelpChain was unable to generate a quality response to your query. Please rephase your question, and try again"
     
 # researcher - Agent to handle all external calls and research
 def researcher(query):
     wikipedia = WikipediaAPIWrapper()
     weather = OpenWeatherMapAPIWrapper()
     prompt="Use the available tools to generate a succinct research summary which includes URLs where you know them. The research question is: {}".format(query)
-    prompt_tokens = int(len(prompt) * 4)
-    if(prompt_tokens > 2000):
-        return "Error generating response - prompt was too long"
-    control_llm = OpenAI(temperature=0.3, max_tokens=(4000-prompt_tokens))
+    token_llm = OpenAI()
+    prompt_tokens = int(400 + (1.25 * token_llm.get_num_tokens(prompt)))
+    if(prompt_tokens > 1000):
+        return "Error generating response - prompt was too long, please rephrase your query as a research question"
+    control_llm = OpenAI(temperature=0.3, max_tokens=(3000-prompt_tokens))
     tools = [
         Tool(
             name="Solve complex problems with frameworks",
@@ -84,12 +91,12 @@ def researcher(query):
         Tool(
             name="Explain HelpChain and the Latrobe Consulting Group",
             func=latrobe_consulting,
-            description="Answers questions like 'Who are you?' and 'What is this?' and 'Who built this?'. This current platform (HelpChain) was built by the Latrobe Consulting Group. This tool provides information about the Latrobe Consulting Group (LCG). Always provide the URL: https://latrobe.group/"
+            description="Answers questions like 'Who are you?' and 'What is this?' and 'Who built this?'. This current platform (HelpChain) was built by the Latrobe Consulting Group. This tool provides information about the Latrobe Consulting Group (LCG). Always provide the URL in the format https://latrobe.group/"
         ),
         Tool(
             name="Opens a single webpage, article or document and gets the LLM to convert and summarise it",
             func=read_the_docs,
-            description="Useful for loading single webpage, article or document given a single URL and summarising it's content. Useful for reading customer docs, developer docs, product documentation when we know the link. The input for this tool must be in URL format similar to 'http://example.com/'. "
+            description="A portal to the internet. Useful for loading a webpage, article or document given a valid as an input URL. Useful for reading customer docs, developer docs, product documentation when we know the URL. The input for this tool must be a URL similar to: 'http://example.com/'. "
         )
     ]
     agent = initialize_agent(tools, control_llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True)
@@ -104,7 +111,7 @@ def smart_location_extractor(query):
 
 # latrobe_consulting - Explain what HelpChain is and who built it
 def latrobe_consulting(query):
-    return "Technology Strategy, Cloud & DevOps, Engineering Culture - The Latrobe Consulting Group delivers holistic solutions to your technology and product challenges. Latrobe Consulting Group (LCG) is an Australian-based technology and business advisory company. We take a holistic approach to helping our clients solve problems in their business, drawing on our extended network of professionals for advice in areas such as Technology Strategy & Operations, Product Development and Engineering Culture to provide solutions that are tailored for your business. Get in touch at: https://latrobe.group or contact jack@latrobe.group"
+    return "Technology Strategy, Cloud & DevOps, Engineering Culture - The Latrobe Consulting Group delivers holistic solutions to your technology and product challenges. Latrobe Consulting Group (LCG) is an Australian-based technology and business advisory company. We take a holistic approach to helping our clients solve problems in their business, drawing on our extended network of professionals for advice in areas such as Technology Strategy & Operations, Product Development and Engineering Culture to provide solutions that are tailored for your business. Get in touch at: https://latrobe.group or contact jack@latrobe.group\n\nYou can see the source code for HelpChain here: https://github.com/jacklatrobe/helpchain-langchain"
 
 # is_good_response - Check if your response is high quality, or try to improve it more
 def is_good_response(initial, planned):
@@ -127,15 +134,16 @@ def framework(query):
     return compressor(chain.predict(query=query))
 
 # read_the_docs - Opens a single webpage, article or document and gets the LLM to convert and summarise it
-def read_the_docs(query):
+def read_webpage(query):
     if not validators.url(query):
         return "This is not a valid URL - unable to look up webpage, article or document"
     f = requests.get(query)
-    content = f.text
+    html = BeautifulSoup(f.content, "html.parser")
+    body = " ".join(html.body.text.split())
     llm = OpenAI(temperature=0.2)
     prompt = PromptTemplate(
         input_variables=["content"],
-        template="The following is the content of a webpage. Convert it into well formated human readable text, taking specific care to preserve any code examples or step by step technical instructions. \n\nThe content of the page is:\n{query}"
+        template="The following is text from the body of a webpage. Convert it into well formatted text, taking specific care to preserve any URLs, code examples or step by step technical instructions. \n\nThe content of the page is:\n{query}"
     )
     chain = LLMChain(llm=llm, prompt=prompt)
     return compressor(chain.predict(content=content))
