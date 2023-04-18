@@ -61,7 +61,7 @@ def intelligent_response(query):
     
 # researcher - Agent to handle all external calls and research
 def researcher(query):
-    wikipedia = WikipediaAPIWrapper()
+    wikipedia = WikipediaAPIWrapper(top_k_results=1)
     weather = OpenWeatherMapAPIWrapper()
     prompt="Use the available tools to generate a succinct research summary which includes URLs where you know them. The research question is: {}".format(query)
     token_llm = OpenAI()
