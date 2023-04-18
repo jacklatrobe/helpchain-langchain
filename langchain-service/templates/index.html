@@ -9,8 +9,8 @@
     <p>
         HelpChain is a novel software solution that utilizes large language models and advanced natural language processing techniques to enable semantic interactions with the software. </br>
         The solution leverages OpenAI, LangChain and more to combine some powerful components into a VERY powerful AI.</br>
-        The key feature of HelpChain is its ability to chain multiple queries together to produce more complex results. </br>
-        This means you can ask more complex, multi-stage questions like "What is the current weather in the hometown of steven hawking raised to the power of 8?"</br>
+        The key feature of HelpChain is its ability to chain multiple queries together to produce more complex results. </br></br>
+        This means you can ask more complex, multi-stage questions like <i>"What is the current weather in the hometown of steven hawking raised to the power of 8?"</i></br></br>
         Give it a shot below.
     </p>
     <form action="" method="get">
@@ -18,9 +18,17 @@
 		<input type="text" id="queryField" name="query">
 		<button type="submit">Submit</button>
 	</form>
-    <blockquote>
-        {{ response }}
-    </blockquote>
+    <hr>
+    <div id="response_block">
+        <div id="query_block">
+            <h2>{{ query }}</h2>
+        </div>
+        <div id="response_body">
+            <p>
+                {{ response }}
+            </p>
+        </div>
+    </div>
 </body>
 <script>
     document.forms[0].addEventListener('submit', function() {
