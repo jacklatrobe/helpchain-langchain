@@ -95,7 +95,7 @@ def researcher(query):
         ),
         Tool(
             name="Opens a single webpage, article or document and gets the LLM to convert and summarise it",
-            func=read_the_docs,
+            func=read_webpage,
             description="A portal to the internet. Useful for loading a webpage, article or document given a valid as an input URL. Useful for reading customer docs, developer docs, product documentation when we know the URL. The input for this tool must be a URL similar to: 'http://example.com/'. "
         )
     ]
