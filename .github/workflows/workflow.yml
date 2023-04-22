@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'langchain-service/**'
+      - 'telstra_scraper/**'
       - 'README.md'
       - 'Dockerfile'
       - '.github/workflows/**'
@@ -40,14 +41,22 @@ jobs:
       run: kubeval deployment.yml
       working-directory: ./config/
         
-    - name: Build container image
+    - name: Build langchain-service image
       run: docker build -t registry.digitalocean.com/helpchain/langchain-service:$(echo $GITHUB_SHA | head -c7) --build-arg WEATHERKEY=${{ secrets.OPENWEATHERMAP_API_KEY }} --build-arg OPENAIKEY=${{ secrets.OPENAI_KEY }} .
+      working-directory: ./langchain-service/
+
+    - name: Build web-scraper image
+      run: docker build -t registry.digitalocean.com/helpchain/web-scraper:$(echo $GITHUB_SHA | head -c7) .
+      working-directory: ./web-scraper/
       
     - name: Log in to DigitalOcean Container Registry with short-lived credentials
       run: doctl registry login --expiry-seconds 1200
       
-    - name: Push image to DigitalOcean Container Registry
+    - name: Push langchain image to DigitalOcean Container Registry
       run: docker push registry.digitalocean.com/helpchain/langchain-service:$(echo $GITHUB_SHA | head -c7)
+
+    - name: Push scraper image to DigitalOcean Container Registry
+      run: docker push registry.digitalocean.com/helpchain/web-scraper:$(echo $GITHUB_SHA | head -c7)
 
     - name: Save DigitalOcean kubeconfig with short-lived credentials for cluster helpchain
       run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 helpchain

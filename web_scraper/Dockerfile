@@ -1,19 +1,20 @@
-# We need an OpenAI API key for the solution to work
-ARG OPENAIKEY
-ARG WEATHERKEY
-
 # Use an official Python runtime as a parent image
 FROM python:slim
 
 # Set the working directory to /langchain-service
-WORKDIR /langchain-service
+WORKDIR /web-scraper
 
 # Copy the current directory contents into the container at /langchain-service
-ADD /langchain-service/. /langchain-service
+ADD . /web-scraper
 
-# Overwrite the python .env file for the /langchain-service
-RUN echo "OPENAI_KEY=${OPENAIKEY}" > /langchain-service/helpchain.env
-RUN echo "OPENWEATHERMAP_API_KEY=${WEATHERKEY}" >> /langchain-service/helpchain.env
+# Build the playwright web scraper
+RUN apt-get install -y software-properties-common
+RUN apt-add-repository non-free
+RUN apt-add-repository contrib
+RUN apt-get update
+RUN pip install playwright==1.20.0
+RUN playwright install-deps chromium
+RUN playwright install chromium
 
 # Install any needed packages specified in requirements.txt
 RUN pip install -r requirements.txt
@@ -23,7 +24,7 @@ RUN pip install -U python-dotenv
 EXPOSE 80
 
 # Define environment variable
-ENV NAME=LangChain
+ENV NAME=WebScraper
 
 # Run app.py when the container launches
 CMD ["python", "main.py"]

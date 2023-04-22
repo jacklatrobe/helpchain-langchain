@@ -1,0 +1,3 @@
+USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) Safari/537.36'
+DOWNLOAD_DELAY = 2
+CONCURRENT_REQUESTS_PER_DOMAIN = 1

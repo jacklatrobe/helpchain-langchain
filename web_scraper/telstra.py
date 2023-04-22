@@ -3,13 +3,13 @@ import requests
 import json
 import scrapy
 
-class SearchSpider(scrapy.Spider):
-    name = 'support-spider'
-    start_urls = ['https://www.telstra.com.au/support/search?query=telstra%20prepaid&area=personal']
+class TelstraSupportSpider(scrapy.Spider):
+    name = 'telstra-support-spider'
+    start_urls = ['https://www.telstra.com.au/support/search?query=QUERYTEXT&area=personal']
 
     def start_requests(self):
         for url in self.start_urls:
-            yield scrapy.Request(url=url, callback=self.parse)
+            yield scrapy.Request(url=url, callback=self.parse, meta={"playwright": True})
 
     def parse(self, response):
         RESULT_FILTER = '.tcom-lego-search-page__list__content'
