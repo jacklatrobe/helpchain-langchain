@@ -1,0 +1,6 @@
+python-dotenv
+validators
+requests
+beautifulsoup4
+Scrapy
+scrapy-playwright

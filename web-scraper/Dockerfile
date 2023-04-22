@@ -8,9 +8,6 @@ WORKDIR /web-scraper
 ADD . /web-scraper
 
 # Build the playwright web scraper
-RUN apt-get install -y software-properties-common
-RUN apt-add-repository non-free
-RUN apt-add-repository contrib
 RUN apt-get update
 RUN pip install playwright==1.20.0
 RUN playwright install-deps chromium
