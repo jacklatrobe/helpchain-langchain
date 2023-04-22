@@ -8,7 +8,7 @@ WORKDIR /web-scraper
 ADD . /web-scraper
 
 # Build the playwright web scraper
-RUN apt-get update && apt-get upgrade
+RUN apt-get update && apt-get upgrade -y
 RUN apt-get install graphviz
 RUN pip install --upgrade pip
 RUN pip install --upgrade setuptools wheel
