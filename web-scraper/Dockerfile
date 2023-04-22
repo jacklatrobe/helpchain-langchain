@@ -8,7 +8,10 @@ WORKDIR /web-scraper
 ADD . /web-scraper
 
 # Build the playwright web scraper
-RUN apt-get update
+RUN apt-get update && apt-get upgrade
+RUN apt-get install graphviz
+RUN pip install --upgrade pip
+RUN pip install --upgrade setuptools wheel
 RUN pip install playwright==1.20.0
 RUN playwright install-deps chromium
 RUN playwright install chromium
