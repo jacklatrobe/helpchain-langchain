@@ -9,7 +9,7 @@ ADD . /web-scraper
 
 # Build the playwright web scraper
 RUN apt-get update && apt-get upgrade -y
-RUN apt-get install graphviz
+RUN apt-get install -y graphviz
 RUN pip install --upgrade pip
 RUN pip install --upgrade setuptools wheel
 RUN pip install playwright==1.20.0
