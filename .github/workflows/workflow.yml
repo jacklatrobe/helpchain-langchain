@@ -39,15 +39,15 @@ jobs:
     # Validate deployment file
     - name: Validate deployment file
       run: kubeval deployment.yml
-      working-directory: $GITHUB_WORKSPACE/config/
+      working-directory: config/
         
     - name: Build langchain-service image
       run: docker build -t registry.digitalocean.com/helpchain/langchain-service:$(echo $GITHUB_SHA | head -c7) --build-arg WEATHERKEY=${{ secrets.OPENWEATHERMAP_API_KEY }} --build-arg OPENAIKEY=${{ secrets.OPENAI_KEY }} .
-      working-directory: $GITHUB_WORKSPACE/langchain-service/
+      working-directory: langchain-service/
 
     - name: Build web-scraper image
       run: docker build -t registry.digitalocean.com/helpchain/web-scraper:$(echo $GITHUB_SHA | head -c7) .
-      working-directory: $GITHUB_WORKSPACE/web-scraper/
+      working-directory: web-scraper/
       
     - name: Log in to DigitalOcean Container Registry with short-lived credentials
       run: doctl registry login --expiry-seconds 1200
