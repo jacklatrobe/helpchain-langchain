@@ -25,7 +25,7 @@ else:
 
 
 # intelligent_response - entry point and wrapper function
-def intelligent_response(query):
+def handle_query(query):
     if os.environ.get("OPENAI_API_KEY") is None:
         return "OpenAI API key error"
     if os.environ.get("OPENWEATHERMAP_API_KEY") is None:
@@ -41,7 +41,7 @@ def intelligent_response(query):
         Tool(
             name="Intermediate Answer",
             func=researcher,
-            description="A general purpose researcher. This tool takes inputs such as URLs, concepts to research or questions to answer and returns a research summary to use in other answers"
+            description="looks up answers to questions"
         )
     ]   
 
