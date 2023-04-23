@@ -3,7 +3,7 @@
 
 from flask import Flask, render_template, request
 from datetime import datetime
-from language_backend import intelligent_response
+from language_backend import handle_query
 
 app = Flask(__name__)
 
@@ -57,7 +57,7 @@ def example_chat_response():
 
 def prepared_chat_response(query):
     msg_sent_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-    bot_response = intelligent_response(query)
+    bot_response = handle_query(query)
     msg_rec_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     response="""
         <div class="msg right-msg">

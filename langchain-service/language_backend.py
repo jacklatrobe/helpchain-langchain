@@ -1,7 +1,6 @@
 ## Helpchain-Langchain: Microservices components for the langchain component of the GPT solution
 ## File: langchain-service/language-backend.py
 
-import openai
 import os
 import validators
 import requests
@@ -13,8 +12,7 @@ from langchain.chains import LLMChain
 from langchain.utilities import WikipediaAPIWrapper
 from langchain.utilities import OpenWeatherMapAPIWrapper
 from langchain.utilities import GoogleSerperAPIWrapper
-from langchain.text_splitter import CharacterTextSplitter
-from langchain.agents import load_tools, Tool
+from langchain.agents import Tool
 from langchain.agents import initialize_agent
 from langchain.agents import AgentType
 
