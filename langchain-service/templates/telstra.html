@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en"
+<head>
+    <meta charset="UTF-8">
+    <title>Telstra.com.au Search Bot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+    <section class="header">
+        <div class="header_div">
+            <img class="header_img" src="{{ url_for('static', filename='img/telstra_banner.png') }}">
+        </div>
+    </section>
+    <section class="msger">
+        <header class="msger-header">
+          <div class="msger-header-title">
+            <i class="fas fa-comment-alt"></i> Telstra.com.au Search Bot by <a href="https://latrobe.group/">https://latrobe.group/</a>
+          </div>
+          <div class="msger-header-options">
+            <span><i class="fas fa-cog"></i></span>
+          </div>
+        </header>
+      
+        <main class="msger-chat">
+            {{ response|safe }}
+        </main>
+      
+        <form class="msger-inputarea" action="" method="get">
+          <input type="text" id="queryField" class="msger-input" placeholder="Enter your message..." name="query">
+          <button type="submit" class="msger-send-btn">Send</button>
+        </form>
+      </section>
+</body>
+<script>
+    document.forms[0].addEventListener('submit', function() {
+        window.location.href = '?query='
+                               + document.getElementById('queryField').value;
+    }, false);
+</script>
+</html>

@@ -46,7 +46,7 @@ def handle_query(query):
         )
     ]   
 
-    agent = initialize_agent(tools, control_llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True)
+    agent = initialize_agent(tools, control_llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True, return_intermediate_steps=True)
     result = agent.run(prompt)
 
     if is_good_response(query,result):
@@ -97,11 +97,7 @@ def researcher(query):
             func=latrobe_consulting,
             description="Answers questions like 'Who are you?' and 'What is this?' and 'Who built this?'. This current platform (HelpChain) was built by the Latrobe Consulting Group. This tool provides information about the Latrobe Consulting Group (LCG). Always provide the URL in the format https://latrobe.group/"
         ),
-        Tool(
-            name="Read a web page",
-            func=read_webpage,
-            description="Use this tool first for all URLs. A portal to the internet. Useful for reading a webpage, article or documentation. The input for this tool must be a URL similar to: 'http://example.com/'"
-        ),
+
         Tool(
             name="Brainstorm",
             func=brainstorm,

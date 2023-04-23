@@ -8,3 +8,5 @@ validators
 requests
 beautifulsoup4
 tiktoken
+yaml
+pypdf 
