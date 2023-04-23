@@ -12,6 +12,7 @@ from langchain.llms import OpenAI
 from langchain.chains import LLMChain
 from langchain.utilities import WikipediaAPIWrapper
 from langchain.utilities import OpenWeatherMapAPIWrapper
+from langchain.utilities import GoogleSerperAPIWrapper
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.agents import load_tools, Tool
 from langchain.agents import initialize_agent
@@ -30,6 +31,8 @@ def handle_query(query):
         return "OpenAI API key error"
     if os.environ.get("OPENWEATHERMAP_API_KEY") is None:
         return "OpenWeatherMap API key error"
+    if os.environ.get("SERPER_API_KEY") is None:
+        return "Serper API key error"
 
     prompt = "Write an accurate, detailed and well-researched response to the following query, question or request:\n{}".format(query)
     token_llm = OpenAI()
@@ -62,6 +65,7 @@ def handle_query(query):
 # researcher - Agent to handle all external calls and research
 def researcher(query):
     wikipedia = WikipediaAPIWrapper(top_k_results=1)
+    googler = GoogleSerperAPIWrapper()
     weather = OpenWeatherMapAPIWrapper()
     prompt="Use the available tools to generate a succinct research summary which includes URLs where you know them. The research question is: {}".format(query)
     token_llm = OpenAI()
@@ -71,34 +75,34 @@ def researcher(query):
     control_llm = OpenAI(temperature=0.2, max_tokens=500)
     tools = [
         Tool(
-            name="Solve complex problems with frameworks",
-            func=framework,
-            description="This tool uses knowledge of problem solving frameworks such as agile, systems thinking and communications theory to suggest structured steps that could be followed to solve more complex challenges. Submit a summary of the query and context to this tool"
+            name="Web Search",
+            func=googler.run,
+            description="A low-cost Google Search API. Useful for when you need to answer questions about current events or look up other websites. Input should be a search query."
         ),
         Tool(
-            name="Search Wikipedia for articles",
+            name="Encyclopedia Search",
             func=wikipedia.run,
             description="Useful for searching for encyclopedia articles about people, places, concepts and historical events. This tool takes key words or search terms as an input"
         ),
         Tool(
-            name="Lookup current weather data",
+            name="Weather Search",
             func=weather.run,
             description="Useful for when you need to search for the current weather in a specific location. The input for this tool must be in the format 'CITY, COUNTRY'"
         ),
         Tool(
-            name="Extract a location from a query",
+            name="Extract a location",
             func=smart_location_extractor,
             description="Useful for extracting a specific location for use in the Weather Lookup tool when given a general area or broad location by a user. Output is in the format 'CITY, COUNTRY'"
         ),
         Tool(
-            name="Explain HelpChain and the Latrobe Consulting Group",
+            name="Explain this platform and who built it",
             func=latrobe_consulting,
             description="Answers questions like 'Who are you?' and 'What is this?' and 'Who built this?'. This current platform (HelpChain) was built by the Latrobe Consulting Group. This tool provides information about the Latrobe Consulting Group (LCG). Always provide the URL in the format https://latrobe.group/"
         ),
         Tool(
-            name="Load a Webpage",
+            name="Read a web page",
             func=read_webpage,
-            description="Use this tool first for all URLs. A portal to the internet. Useful for loading a webpage, article or document given a valid as an input URL. Useful for reading customer docs, developer docs, product documentation when we know the URL. The input for this tool must be a URL similar to: 'http://example.com/'"
+            description="Use this tool first for all URLs. A portal to the internet. Useful for reading a webpage, article or documentation. The input for this tool must be a URL similar to: 'http://example.com/'"
         ),
         Tool(
             name="Brainstorm",
